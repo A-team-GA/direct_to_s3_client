@@ -1,8 +1,10 @@
 var ImageApp = ImageApp || {}
 
+var key = "";
+
 ImageApp.getAmazonURL = function() {
   $.ajax({
-    url: 'http://localhost:3000/amazon/sign_key',
+    url: 'https://pixelect-rails-api.herokuapp.com/amazon/sign_key',
     type: 'GET',
     data: {file_name: 'url.jpg'},
   })
@@ -12,6 +14,7 @@ ImageApp.getAmazonURL = function() {
     $('#accessKey').val(result.access_key);
     $('#acl').val(result.acl);
     $('#key').val(result.key);
+    key = "https://s3.amazonaws.com/pixelect-ig/" + result.key;
   })
   .fail(function(error) {
     console.log(error);
@@ -23,6 +26,17 @@ ImageApp.getAmazonURL = function() {
 };
 
 
+ImageApp.addUrlToAPI = function() {
+  $.ajax({
+    url: 'https://pixelect-rails-api.herokuapp.com/images',
+    type: 'POST',
+    data: {image: {file_name: 'placeholder', image_file: 'placeholder', image_url: key, flag: '0', image_set_id: '1'}}
+  }).done(function(response) {
+    console.table(response);
+  });
+}
+
 $(document).ready(function() {
   ImageApp.getAmazonURL();
+  $('#submitButton').on('click', ImageApp.addUrlToAPI);
 });
